@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/main.scss'],
-
+  
   vite: {
     css: {
       preprocessorOptions: {
@@ -12,7 +12,7 @@ export default defineNuxtConfig({
       }
     }
   },
-
+  
   experimental: {
     renderJsonPayloads: false
   },

@@ -25,6 +25,7 @@ const props = defineProps({
         flex-wrap:wrap;
         border: 0.5rem solid;
         border-color: $surface;
+        border-radius: 10px;
         width: 30%;
         margin: 0% auto;
     }

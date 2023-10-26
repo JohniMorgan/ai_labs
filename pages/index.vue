@@ -1,12 +1,15 @@
 <template>
     <h1>Hello, world!</h1>
 
-    <a href="/about">Эта ссылка ведёт на страницу "О нас"</a><br>
     <nuxt-link to="/about">То же самое но nuxt-link</nuxt-link>
 
+    <span>Текущая глубина решения {{ stateStore.currentNode.depth }}</span>
+
     <ai-game-board :configuration="stateStore.view.configuration"/>
-    <jm-btn @click="switchTile">Один шаг DFS</jm-btn>
+    <jm-btn @click="oneStepDFS">Один шаг DFS</jm-btn>
     <jm-btn @click="startAutoDFS">Запустить поиск решения (DFS)</jm-btn>
+    <jm-btn @click="oneStepIterDFS">Один шаг итеративного DFS</jm-btn>
+    <jm-btn @click="startAutoIterativ">Запустить поиск решения (IterDFS)</jm-btn>
     Текущая итерация: {{ stateStore.stepCount }}
 </template>
 
@@ -15,12 +18,20 @@ import {useStateStore} from "@/store/stateStore"
 
 const stateStore = useStateStore();
 
-function switchTile() {
+function oneStepDFS() {
     stateStore.findWays();
     stateStore.nextStep();
 }
 
+function oneStepIterDFS() {
+    stateStore.IterativDFSStep();
+}
+
 function startAutoDFS() {
     stateStore.autoDFS();
+}
+
+function startAutoIterativ() {
+    stateStore.autoIterativ();
 }
 </script>
