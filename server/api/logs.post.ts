@@ -1,12 +1,10 @@
-import fs from 'fs'
+import fs from 'node:fs'
 
 export default defineEventHandler(async (event) => {
-    const body = await readBody(event);
-    console.log(body);
+        const body = await readBody(event);
 
-    fs.appendFile('assets/logs.txt', body.content + '\n', (err) => {
-        console.log(err);
-    })
-
-    return true;
+        fs.appendFile(`public/${body.path}`, body.content + '\n', (err) => {
+            if (err) throw err;
+        })
+    
 })

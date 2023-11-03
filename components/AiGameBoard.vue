@@ -26,7 +26,8 @@ const props = defineProps({
         border: 0.5rem solid;
         border-color: $surface;
         border-radius: 10px;
-        width: 30%;
-        margin: 0% auto;
+        min-width: 200px;
+        width: 65%;
+        max-width: 400px;
     }
 </style>

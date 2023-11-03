@@ -29,6 +29,9 @@ class NodeStack {
     push(state: SolutionNode) {
         this.instance.push(state);
     };
+    getInst() {
+        return this.instance;
+    }
     pop() : SolutionNode {
         const back = this.instance[this.instance.length-1];
         this.instance.splice(this.instance.length-1, 1);
@@ -39,12 +42,12 @@ class NodeStack {
     }
 }
 
-enum Direction { UP, DOWN, RIGHT, LEFT }
+enum Direction { START, UP, DOWN, RIGHT, LEFT }
 
 interface SolutionNode {
     state: Statement;
     depth: number;
-    parent_direction: Direction | null;
+    parent_direction: Direction;
     parent_node: SolutionNode | null;
 }
 

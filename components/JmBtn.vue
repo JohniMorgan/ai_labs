@@ -12,13 +12,16 @@
         display: flex;
         justify-content: space-around;
         align-items: center;
+        margin-top: 5px;
+        margin-bottom: 5px;
         .custom {
             background-color: $secondary;
             color: $text;
             transition: background-color 0.25s;
             padding: 0 16px;
             border-radius: 5px;
-            height: 2em;
+            min-height: 2em;
+            
 
             * {
                 padding-left: 5px;

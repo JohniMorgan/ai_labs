@@ -1,7 +1,11 @@
 <template>
   <div>
     <nuxt-layout>
-      <NuxtPage />
+      <template #head>
+        Лабораторная работа №1,2 по ВвИИ<br>
+        Работу выполнили: Бутов Е.С. Кашапова О.С. Севостьянова А.А.
+      </template>
+      <nuxt-page />
     </nuxt-layout>
   </div>
 </template>
