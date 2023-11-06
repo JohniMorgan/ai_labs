@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/main.scss'],
+  ssr: true,
   
   vite: {
     css: {
@@ -10,7 +11,7 @@ export default defineNuxtConfig({
           additionalData: '@use "@/assets/_colors.scss" as *;'
         }
       }
-    }
+    },
   },
   
   experimental: {

@@ -1,74 +1,56 @@
 <template>
-    <h1>Hello, world!</h1>
-
-    <nuxt-link to="/about">То же самое но nuxt-link</nuxt-link>
-
-    <v-row>
-        <v-col class="centered">
-            <v-btn @click="oneStepDFS">Один шаг DFS</v-btn>
-            <v-btn @click="startAutoDFS">Автоматически DFS</v-btn>
-        </v-col>
-        <v-col cols="4" class="centered">
-            <label>Текущая глубина решения {{ stateStore.depthForUser }}</label>
-            <ai-game-board :configuration="stateStore.view.configuration"/>
-            <label>Текущая итерация: {{ stateStore.stepCountForUser }}</label>
-            <a href="/logs.txt" download v-if="stateStore.logsReady">Получить логи отработанного алгоритма</a>
-        </v-col>
-        <v-col class="centered">
-            <v-btn @click="oneStepIterDFS">Один шаг итеративного DFS</v-btn>
-            <v-btn @click="startAutoIterativ">Автоматически (iterDFS)</v-btn>
-        </v-col>
-</v-row>
-    
+    <div class="centered">
+        <v-card>
+            <nuxt-link to="/algorithm/dfs" class="link-as-btn">Лабораторная работа №1.1 (DFS)</nuxt-link>
+            <nuxt-link to="/algorithm/iterativ" class="link-as-btn">Лабораторная работа №1.2 (IterativDFS)</nuxt-link>
+            <nuxt-link to="/" class="link-as-btn" disabled>Лабораторная работа #2.1 (A* DFS)</nuxt-link>
+            <nuxt-link to="/" class="link-as-btn" disabled>Лабораторная работа #2.2 (A* IterativeDFS)</nuxt-link>
+        </v-card>
+    </div>
 </template>
 
-<script setup lang="ts">
-import {useStateStore} from "@/store/stateStore"
+<style lang="scss" scoped>
 
-const stateStore = useStateStore();
+    .link-as-btn {
+        min-height: 2em;
+        width: 250px;
+        background-color: $secondary;
+        display: flex;
+        align-content: center;
+        justify-content: center;
+        text-align: center;
+        padding: {
+            right: 10px;
+            left:10px;
+            top: 5px;
+            bottom: 5px;
+        }
+        margin: {
+            top: 15px;
+            bottom: 15px;
+        }
+        color: $text;
+        border-radius: 8px;
 
-function oneStepDFS() {
-    stateStore.findWays();
-    stateStore.nextStep();
-}
+        &:hover {
+            color: $text;
+            background-color: $secondary-hover;
+        }
+    }
 
-function oneStepIterDFS() {
-    stateStore.IterativDFSStep();
-}
-
-function startAutoDFS() {
-    stateStore.autoDFS();
-}
-
-function startAutoIterativ() {
-    stateStore.autoIterativ();
-}
-
-function debugCheck() {
-    const lentgh = 40000;
-    let count = 0;
-
-    setTimeout(function oneStep() {
-        count++;
-        if (count != lentgh) setTimeout(oneStep, 100);
-    }, 100);
-    console.log(count);
-}
-</script>
-
-<style lang="scss">
-    .centered {
+    .v-card {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        > label {
-            padding: 15px 0px;
-        }
-    }
+        width: 50%;
 
-    .v-btn {
-        margin-top: 10px;
-        margin-bottom: 5px;
+        @media (max-width: 660px) {
+            width: 90%;
+        }
+        padding: {
+            top: 15px; 
+            bottom: 15px;
+        }
     }
 </style>

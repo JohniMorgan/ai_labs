@@ -1,3 +1,6 @@
+import api from './axios.configuration';
+
+
 export class Logger {
     private static buffer : string;
     private filePath: string;
@@ -7,7 +10,7 @@ export class Logger {
     }
 
     openStream() {
-        useFetch('/api/createlog', {
+        $fetch('/api/createlog', {
             method: 'post',
             body:{
                 value:  this.filePath,
@@ -24,15 +27,15 @@ export class Logger {
     }
 
     async dump() {
-        await useFetch('/api/logs', {
+        await $fetch('/api/logs', {
             method: 'post',
             headers: {
-                contentType: 'text/html; charset=utf-8',
+                contentType: 'text/plain; charset=utf-8',
             },
-            body: {
+            body: JSON.stringify({
                 content: Logger.buffer,
                 path: this.filePath,
-            }
+            }),
         })  
     }
 }

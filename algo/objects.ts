@@ -33,16 +33,24 @@ class NodeStack {
         return this.instance;
     }
     pop() : SolutionNode {
-        const back = this.instance[this.instance.length-1];
-        this.instance.splice(this.instance.length-1, 1);
+        const back = this.instance[this.instance.length - 1];
+        this.instance.splice(this.instance.length - 1, 1);
         return back;
     };
+    get() : SolutionNode {
+        return this.instance[this.instance.length - 1];
+    }
     isEmpty() : boolean {
         return this.instance.length == 0;
-    }
+    };
+    reset() {
+        this.instance = [];
+    };
+
 }
 
-enum Direction { START, UP, DOWN, RIGHT, LEFT }
+enum Direction { START = "Start", UP = 'Вверх', DOWN = 'Вниз',
+ RIGHT = 'Вправо', LEFT = 'Влево' }
 
 interface SolutionNode {
     state: Statement;
