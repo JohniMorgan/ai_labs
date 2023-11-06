@@ -1,2 +1,0 @@
-import{C as _,q as r,o as u,c as p,a as d,t as l,v as n}from"./entry.df8e9e6b.js";const f={class:"view-wraper"},v={class:"view"},h={__name:"ConfigurationView",props:{data:Object},setup(o){_(e=>({"2aa84dda":n(i)}));const t=o,c=r(()=>{let e="";return t.data.conf.forEach((a,s)=>{s%3==0&&(e+="| "),e+=a+" ",s%3==2&&(e+=`|
-`)}),e}),i=r(()=>{switch(t.data.visited){case"visited":return"#D0021B";case"free":return"#167201";case"untouch":return"#E89100";case"none":return"#172326"}});return(e,a)=>(u(),p("div",f,[d("label",v,l(n(c)),1)]))}};export{h as _};
