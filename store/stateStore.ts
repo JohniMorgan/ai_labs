@@ -11,7 +11,7 @@ interface Point {
 
 enum Status {
     wait = 'Ожидает',
-    simulate = 'Сиуляция пути',
+    simulate = 'Симуляция пути',
     ready = 'Готово',
     noSolution = 'Нет решений',
 }

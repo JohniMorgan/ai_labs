@@ -16,7 +16,14 @@
                     color="red"/>
                 <label>Идёт запись логов, необходимо подождать</label>
             </div>
-            <a href="/logs.txt" download v-if="stateStore.logsReady">Получить логи отработанного алгоритма</a>
+            <a 
+                href="/logs.txt" 
+                download
+                v-if="stateStore.logsReady"
+                class="link-as-btn"
+            >
+                Получить логи отработанного алгоритма
+            </a>
     </div>
 </template>
 
