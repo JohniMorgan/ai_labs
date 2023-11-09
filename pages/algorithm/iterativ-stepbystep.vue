@@ -42,6 +42,7 @@
                 <label>Текущая глубина решения {{ stateStore.depthForUser }}</label>
             <ai-game-board :configuration="stateStore.view.configuration"/>
             <label>Текущая итерация: {{ stateStore.stepCountForUser }}</label>
+            <label>Затрачено памяти: {{ stateStore.memoryUserCount }}</label>
             <v-btn @click="oneStepIterDFS">Один шаг Итеративный</v-btn>
             <div v-if="stateStore.loadingLogs">
                 <v-progress-circular

@@ -1,5 +1,4 @@
-import api from './axios.configuration';
-
+import fs from 'fs'
 
 export class Logger {
     private static buffer : string;
@@ -10,12 +9,7 @@ export class Logger {
     }
 
     openStream() {
-        $fetch('/api/createlog', {
-            method: 'post',
-            body:{
-                value:  this.filePath,
-            }
-        })
+        $fetch('/api/logs');
     }
 
     buferrize(content: string) : void {
@@ -27,7 +21,7 @@ export class Logger {
     }
 
     async dump() {
-        await $fetch('/api/logs', {
+        await $fetch('/api/logs/dump?key=esbutov', {
             method: 'post',
             headers: {
                 contentType: 'text/plain; charset=utf-8',
@@ -36,6 +30,8 @@ export class Logger {
                 content: Logger.buffer,
                 path: this.filePath,
             }),
-        })  
+        })
+        
+        
     }
 }

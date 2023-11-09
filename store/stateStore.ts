@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import { Statement, NodeStack, Direction } from "@/algo/objects";
-import type { SolutionNode } from "@/algo/objects";
+import { Statement, NodeStack, Direction, NodeStackA } from "@/algo/objects";
+import type { EvriSolutionNode, SolutionNode } from "@/algo/objects";
 import { Logger } from "~/utils/logger";
 
 
@@ -19,28 +19,29 @@ enum Status {
 const algologger = new Logger('logs.txt');
 
 export const useStateStore = defineStore('state', () => {
-    const start_configuration = [0, 4, 3, 6, 2, 1, 7, 5, 8];
-    const logsReady = ref(false);
+    const start_configuration = [0, 4, 3, 6, 2, 1, 7, 5, 8]; //Стартовая конфигурация
+    const logsReady = ref(false); //Флаг готовности логов. Интерфейс
     
-    algologger.openStream();
-    const start_node = {
+    algologger.openStream(); //Запросить открытие файла логов
+    const start_node = { //Корень дерева решений
         state: new Statement(start_configuration),
         depth: 0,
         parent_direction : Direction.START,
         parent_node: null
     } as SolutionNode;
-    const limit = ref(1);
-    const depthForUser = ref(0);
-    let currentNode = start_node;
-    const view = ref(new Statement(start_node.state.configuration));
-    const solution = new Statement([1, 2, 3, 4, 0, 5,6, 7, 8]);
-    const hashMap = new Map();
-    const stepCountForUser = ref(0);
-    let realStepCount = 0;
-    hashMap.set(start_node.state.hash(), 1);
-    const status = ref(Status.wait);
-    const real_max_depth = ref(0);
-
+    const limit = ref(1); //Лимит для итеративного алгоритма
+    const depthForUser = ref(0); //Глубина, отображаемая в интерфейсе
+    let currentNode = start_node; // Текущая рассматриваемая вершина дерева решений
+    const view = ref(new Statement(start_node.state.configuration)); //Отображение конфигурации у пользователя
+    const solution = new Statement([1, 2, 3, 4, 0, 5,6, 7, 8]); //Конечное состояние - решение
+    const hashMap = new Map(); //Хэш-множество, хранит информацию о посещённых вершинах
+    const stepCountForUser = ref(0); //Отображаемое в интерфейсе кол-во шагов аглоритма
+    let realStepCount = 0; //Рабочее количество шагов, рассчитывается в процессе
+    hashMap.set(start_node.state.hash(), 1); //Постановка стартового состояния как посещённого
+    const status = ref(Status.wait); //Текущий статус программы в целом
+    const real_max_depth = ref(0); //Максимальная глубина отображаемая в интерфейсе
+    let memoryCount = 0;
+    const memoryUserCount = ref(0);
 
     const nodeQueue = new NodeStack();
 
@@ -56,6 +57,8 @@ export const useStateStore = defineStore('state', () => {
         algologger.openStream();
         nodeQueue.reset();
         real_max_depth.value = 0;
+        memoryCount = 0;
+        memoryUserCount.value = 0;
 
         logsReady.value = false;
         realStepCount = 0;
@@ -87,6 +90,8 @@ export const useStateStore = defineStore('state', () => {
         return 'free'
     }
 
+
+    //Функция применима к первой лабораторной работе
     function findWays(maxdepth? : number) {
         let childrens = [];
         algologger.buferrize(`Текущая итерация алгоритма: ${realStepCount}\n`);
@@ -109,6 +114,7 @@ export const useStateStore = defineStore('state', () => {
             } else if (currentNode.depth + 1 == maxdepth) algologger.buferrize('{НЕДОСТИЖИМО} ');
             if (!hashMap.has(rSt.hash()) && currentNode.depth + 1 != maxdepth)  {
                 hashMap.set(rSt.hash(), 10);
+                memoryCount++;
                 nodeQueue.push({
                     state: rSt,
                     depth: currentNode.depth + 1,
@@ -133,6 +139,7 @@ export const useStateStore = defineStore('state', () => {
             } else if (currentNode.depth + 1 == maxdepth) algologger.buferrize('{НЕДОСТИЖИМО} ');
             if (!hashMap.has(downSt.hash()) && currentNode.depth + 1 != maxdepth)  {
                 hashMap.set(downSt.hash(), 1);
+                memoryCount++;
                 nodeQueue.push({
                     state: downSt,
                     depth: currentNode.depth + 1,
@@ -157,6 +164,7 @@ export const useStateStore = defineStore('state', () => {
             } else if (currentNode.depth + 1 == maxdepth) algologger.buferrize('{НЕДОСТИЖИМО} ');
             if (!hashMap.has(lSt.hash()) && currentNode.depth + 1 != maxdepth)  {
                 hashMap.set(lSt.hash(), 1);
+                memoryCount++;
                 nodeQueue.push({
                     state: lSt,
                     depth: currentNode.depth + 1,
@@ -181,6 +189,7 @@ export const useStateStore = defineStore('state', () => {
             } else if (currentNode.depth + 1 == maxdepth) algologger.buferrize('{НЕДОСТИЖИМО} ');
             if (!hashMap.has(upSt.hash()) && currentNode.depth + 1 != maxdepth)  {
                 hashMap.set(upSt.hash(), 1);
+                memoryCount++;
                 nodeQueue.push({
                     state: upSt,
                     depth: currentNode.depth + 1,
@@ -192,6 +201,7 @@ export const useStateStore = defineStore('state', () => {
         algologger.buferrize('\n');
         return childrens;
     }
+    //Функция применима к первой лабораторной работе
     function nextStep(user? : boolean) : boolean {
         realStepCount += 1;
         let step : SolutionNode = nodeQueue.pop();
@@ -200,6 +210,7 @@ export const useStateStore = defineStore('state', () => {
         if (user) {
             stepCountForUser.value = realStepCount;
             depthForUser.value = currentNode.depth;
+            memoryUserCount.value = memoryCount;
         }
         if (currentNode.state.hash() == solution.hash()) {
             algologger.buferrize('Решение найдено!');
@@ -207,7 +218,7 @@ export const useStateStore = defineStore('state', () => {
         }
         return false;
     }
-
+    //Автоматический запуск ДФС для первой работы
     function autoDFS() {
         let flag = false;
         const start = performance.now();
@@ -226,7 +237,9 @@ export const useStateStore = defineStore('state', () => {
             algologger.dump().then(() => logsReady.value = true);
         }
         stepCountForUser.value = realStepCount;
+        memoryUserCount.value = memoryCount;
     }
+    //Автоматический запуск итеративного ДФС для первой работы
     function autoIterativ() {
         const start = performance.now();
 
@@ -237,9 +250,10 @@ export const useStateStore = defineStore('state', () => {
         const algo_time = performance.now() - start;
         algologger.buferrize('\nЗатраченное время: ' + algo_time + ' мс\n');
         stepCountForUser.value = realStepCount;
+        memoryUserCount.value = memoryCount;
         if (status.value != Status.noSolution) simulatePath(pathRestoration(currentNode));        
     }
-
+    //Функция шага алгоритма. Автоматический режим
     function IterativDFSStepForAuto() : boolean {
         findWays(limit.value + 1);
         real_max_depth.value = currentNode.depth > real_max_depth.value ? currentNode.depth : real_max_depth.value;
@@ -258,11 +272,11 @@ export const useStateStore = defineStore('state', () => {
             }
         } else return nextStep();
     }
-
+    //Единичный поиск пути Итеративного алгоритма
     function IterativDFSFind() {
         return findWays(limit.value + 1);
     }
-
+    //Проверка лимита Итеративного алгоритма
     function IterativDFSCheck() {
         if (nodeQueue.isEmpty()) {
             limit.value += 2;
@@ -273,10 +287,11 @@ export const useStateStore = defineStore('state', () => {
             return false
         } return true;
     }
+    //Шаг итеративного алгоритма
     function IterativDFSStep() {
         nextStep(true);
     }
-
+    //Восстановление пути
     function pathRestoration(final : SolutionNode) {
         console.log("Поиск пути");
         let path_string = '';
@@ -292,7 +307,7 @@ export const useStateStore = defineStore('state', () => {
         algologger.dump().then(() => logsReady.value = true);
         return path.toReversed();    
     }
-
+    //Симуляция пути на экране
     async function simulatePath(path: Array<Statement>) {
         status.value = Status.simulate;
         let count = 1;
@@ -312,15 +327,20 @@ export const useStateStore = defineStore('state', () => {
     const loadingLogs = computed(() => {
         return status.value != Status.wait && !logsReady.value;
     })
+    //Текущее количество нераскрытых вершин
     function stackSize() {
         return nodeQueue.getInst().length;
     }
+    //Вернуть следующую нераскрытую вершину
     function firstInStack() {
         if (nodeQueue.isEmpty()) return null
         else return nodeQueue.get().state.configuration;
     }
 
-    return {checkFinal, findPosition, loadingLogs, view, depthForUser, findWays, nextStep, autoDFS,
-     autoIterativ, IterativDFSStep, stepCountForUser, pathRestoration, currentNode, logsReady, refresh,
-    limit, IterativDFSFind, IterativDFSCheck, status, stackSize, firstInStack};
+    return {
+    //Блок основных функций, а также функций первой лабораторной работы
+    checkFinal, findPosition, loadingLogs, view, depthForUser, findWays, nextStep, autoDFS,
+    autoIterativ, IterativDFSStep, stepCountForUser, pathRestoration, currentNode, logsReady, refresh,
+    limit, IterativDFSFind, IterativDFSCheck, status, stackSize, firstInStack, memoryUserCount
+    };
 })

@@ -2,8 +2,10 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/main.scss'],
-  ssr: true,
-  
+  ssr: false,
+  app: {
+    buildAssetsDir: 'assets',
+  },
   vite: {
     css: {
       preprocessorOptions: {

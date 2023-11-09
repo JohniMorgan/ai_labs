@@ -46,11 +46,35 @@ class NodeStack {
     reset() {
         this.instance = [];
     };
-
 }
 
-enum Direction { START = "Start", UP = 'Вверх', DOWN = 'Вниз',
- RIGHT = 'Вправо', LEFT = 'Влево' }
+class NodeStackA {
+    private inst: Array<EvriSolutionNode>
+
+    constructor() {
+        this.inst = new Array<EvriSolutionNode>;
+    }
+
+    push(node: EvriSolutionNode) {
+        this.inst.push(node);
+    };
+    pop() : EvriSolutionNode {
+        const back = this.inst[this.inst.length - 1];
+        this.inst.splice(this.inst.length - 1, 1);
+        return back;
+    };
+    reset() {
+        this.inst = [];
+    };
+    get = () : EvriSolutionNode => this.inst[this.inst.length - 1];
+    get isEmpty() : boolean {
+        return this.inst.length == 0;
+    }
+    get size() : number { return this.inst.length; }
+}
+
+enum Direction { START = "Start", UP = 'Вверх', RIGHT = 'Вправо', DOWN = 'Вниз',
+  LEFT = 'Влево' }
 
 interface SolutionNode {
     state: Statement;
@@ -59,7 +83,11 @@ interface SolutionNode {
     parent_node: SolutionNode | null;
 }
 
+interface EvriSolutionNode extends SolutionNode {
+    evristic: number;
+}
 
 
-export {Statement, NodeStack, Direction}
-export type { SolutionNode }
+
+export {Statement, NodeStack, Direction, NodeStackA}
+export type { SolutionNode, EvriSolutionNode }

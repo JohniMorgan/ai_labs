@@ -5,6 +5,7 @@
         <label>Полученая глубина решения {{ stateStore.depthForUser }}</label>
             <ai-game-board :configuration="stateStore.view.configuration"/>
             <label>Выполненых итераций: {{ stateStore.stepCountForUser }}</label>
+            <label>Затрачено памяти: {{ stateStore.memoryUserCount }}</label>
             <v-btn @click="startAutoIterativ" v-if="stateStore.status == 'Ожидает'">Автоматический Итеративный</v-btn>
             <v-btn v-else @click="stateStore.refresh()">Сбросить алгоритм</v-btn>
             <div v-if="stateStore.loadingLogs">

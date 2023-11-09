@@ -5,6 +5,7 @@
         <label>Полученая глубина решения {{ stateStore.depthForUser }}</label>
             <ai-game-board :configuration="stateStore.view.configuration"/>
             <label>Выполненых итераций: {{ stateStore.stepCountForUser }}</label>
+            <label>Затрачено памяти: {{ stateStore.memoryUserCount }}</label>
             <v-btn @click="startAutoDFS"
                 v-if="stateStore.status == 'Ожидает'"
             >Автоматически DFS</v-btn>
