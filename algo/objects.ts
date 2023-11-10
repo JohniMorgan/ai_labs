@@ -66,7 +66,7 @@ class NodeStackA {
     reset() {
         this.inst = [];
     };
-    get = () : EvriSolutionNode => this.inst[this.inst.length - 1];
+    show = () : EvriSolutionNode => this.inst[this.inst.length - 1];
     get isEmpty() : boolean {
         return this.inst.length == 0;
     }

@@ -1,6 +1,6 @@
 import { Statement, Direction, type EvriSolutionNode, NodeStackA, type SolutionNode } from "~/algo/objects";
 
-const logger = new Logger('lab_2.logs.txt');
+const logger = new Logger();
 
 interface Point {x: number, y: number};
 
@@ -30,9 +30,12 @@ export const useEvristicStore = defineStore('evristic', () => {
        [1, 2, 3,
         4, 0, 5,
         6, 7, 8];
-    logger.openStream();
+        logger.openStream().then(res => {
+            logger.setFilePath(res.data.value!.filename);
+        });
+    
 
-    let logsReady = false;
+    const logsReady = ref(false);
     
     let limit = 1; //Текущий лимит алгоритма
     let currentNode = { //Текущая отслеживаемая вершина
@@ -61,12 +64,17 @@ export const useEvristicStore = defineStore('evristic', () => {
     const view = ref(new Statement(start_configuration));
     const result_time = ref(0);
     const solution_depth = ref(0);
-    let status = Status.wait;
+    const limitForUser = ref(1);
+    const status = ref(Status.wait);
+    const log_link = ref('');
 
     function refresh() { //Сбросить состояние в начальное
-        logsReady = false;
-        status = Status.wait;
+        logsReady.value = false;
+        logger.reset();
+        logger.openStream().then(res => logger.setFilePath(res.data.value!.filename));
+        status.value = Status.wait;
         limit = 1;
+        limitForUser.value = 1;
         real_max_depth = 0;
         currentNode = { 
             state: new Statement(start_configuration),
@@ -92,6 +100,13 @@ export const useEvristicStore = defineStore('evristic', () => {
         start_configuration = start;
         end_configuration = end;
         solution.configuration = end_configuration;
+    }
+
+    function checkNodeStatusLog(hash: number, nowDepth?: number, depth? : number) {
+        if (hashMap.has(hash)) return -1
+        if (depth != undefined)
+            if (nowDepth! + 1 >= depth) return -2
+        return 0
     }
 
     function check(st: Statement) {
@@ -134,9 +149,14 @@ export const useEvristicStore = defineStore('evristic', () => {
 
     function findWays(evriFunc: (conf: Array<number>) => number, maxdepth? : number) {
         let childrens = new Array<EvriSolutionNode>;
-        let childrensLog = [];
-        //logger.buferrize(`Текущая итерация алгоритма: ${stepCount}\n`);
-        //logger.buferrize(`[${currentNode.state.configuration}] `);
+        let childrensLog = new Array<{
+            conf: Array<number>,
+            visitStatus: number,
+            evristic: number,
+        }>;
+        logger.buferrize(`Текущая итерация алгоритма: ${stepCount}\n`);
+        logger.buferrize(`[${currentNode.state.configuration}] `);
+        logger.buferrize(' Потомки выбранной вершины: \n');
         const nullPosition = findPosition(0, currentNode.state.configuration);
         Object.values(Direction).forEach((d) => {
             if (d != Direction.START) { // Обойти стартовое состояние
@@ -149,7 +169,16 @@ export const useEvristicStore = defineStore('evristic', () => {
                 //Движение возможно
                 let temp = new Statement(currentNode.state.configuration);
                 temp.swap(nullPosition.x * 3 + nullPosition.y, arrayPosition);
-                childrensLog.push({conf: temp.configuration});
+                let child = {
+                    conf: temp.configuration,
+                    visitStatus: checkNodeStatusLog(temp.hash(), currentNode.depth, maxdepth),
+                    evristic: Math.max(evriFunc(temp.configuration) + currentNode.depth + 1, currentNode.evristic),
+                }
+                childrensLog.push(child);
+                logger.buferrize(`[${child.conf}] `);  
+                logger.buferrize((child.visitStatus == -1) ? "{ПОСЕЩЕНО} " : ' ');
+                logger.buferrize((child.visitStatus == -2) ? "{НЕДОСТИЖИМО} " : ' ');
+                logger.buferrize(`Значение f(n) = ${child.evristic}\n`);
                 if (!check(temp) && (currentNode.depth + 1 != maxdepth)) {
                     hashMap.set(temp.hash(), 1);
                     memoryCount += 1;
@@ -163,6 +192,7 @@ export const useEvristicStore = defineStore('evristic', () => {
                 }
             }
         }
+        
         });
 
         childrens.sort((a, b) => b.evristic - a.evristic);
@@ -170,7 +200,8 @@ export const useEvristicStore = defineStore('evristic', () => {
         childrens.forEach(el => {
             nodeStack.push(el);
         })
-        
+
+        return childrensLog;        
     }
     
     function nextStep(user? : boolean) : boolean {
@@ -185,7 +216,8 @@ export const useEvristicStore = defineStore('evristic', () => {
         }
 
         if (currentNode.state.hash() == solution.hash()) {
-            status = Status.ok;
+            logger.buferrize('Решение найдено!\n');
+            status.value = Status.ok;
             return true;
         }
         return false;
@@ -202,21 +234,27 @@ export const useEvristicStore = defineStore('evristic', () => {
         const algo_time = performance.now() - start;
 
         result_time.value = algo_time;
+        logger.buferrize(`\nВремя работы алгоритма: ${algo_time} мс.\n`)
 
-        if (nodeStack.isEmpty) status = Status.noSolution;
-        if (status == Status.ok) simulatePath(pathRestoration(currentNode));
+        if (nodeStack.isEmpty) {
+            status.value = Status.noSolution;
+            logger.buferrize('Решение не найдено!\n');
+            logger.dump().then(() => logsReady.value = true);
+        }
+        if (status.value == Status.ok) simulatePath(pathRestoration(currentNode));
 
         stepCountForUser.value = stepCount;
         memoryUserCount.value = memoryCount;
         solution_depth.value = currentNode.depth;
     }
 
-    function IterativFindWays(non_place : boolean) : void {
-        findWays(non_place ? nonOwnPlace : manhattanDistance, limit + 1);
+    function IterativFindWays(non_place : boolean) {
+       return findWays(non_place ? nonOwnPlace : manhattanDistance, limit + 1);
     }
     function IterativCheck() : boolean {
         if (nodeStack.isEmpty) {
             limit += 2;
+            limitForUser.value += 2;
             currentNode = { 
                 state: new Statement(start_configuration),
                 depth: 0,
@@ -230,8 +268,8 @@ export const useEvristicStore = defineStore('evristic', () => {
         } return false;
     }
 
-    function IterativStep(flag? : boolean) : boolean {
-        return nextStep();
+    function IterativStep() : boolean {
+        return nextStep(true);
     }
 
     function IterativStepForAuto(non_place : boolean) : boolean {
@@ -239,9 +277,9 @@ export const useEvristicStore = defineStore('evristic', () => {
         real_max_depth = Math.max(real_max_depth, currentNode.depth);
         if (nodeStack.isEmpty) {
             if (real_max_depth != limit) { 
-                //algologger.buferrize("Решений нет\n");
-                status = Status.noSolution;
-                console.log("Решений нет");
+                logger.buferrize("Решение не найдено!\n");
+                status.value = Status.noSolution;
+                logger.dump().then(() => logsReady.value = true);
                 return true;
             } else {
                 limit += 2;
@@ -269,8 +307,9 @@ export const useEvristicStore = defineStore('evristic', () => {
             stopFlag = IterativStepForAuto(non_place);
         }
         const algo_time = performance.now() - start;
+        logger.buferrize(`\nВремя раболты алгоритма: ${algo_time} мс.\n`)
 
-        if (status == Status.ok) simulatePath(pathRestoration(currentNode));
+        if (status.value == Status.ok) simulatePath(pathRestoration(currentNode));
 
         stepCountForUser.value = stepCount;
         memoryUserCount.value = memoryCount;
@@ -280,44 +319,55 @@ export const useEvristicStore = defineStore('evristic', () => {
 
     //Набор функций для восстановления и отображения пользователю пути
     function pathRestoration(final : EvriSolutionNode) {
-        console.log("Поиск пути");
         let pathNode : SolutionNode;
         pathNode = final;
-        //let path_string = '';
+        let path_string = '';
         let path = new Array<Statement>;
             while(pathNode.parent_node != null) {
                 path.push(pathNode.state);
-                //path_string = final.parent_direction + " " + path_string; 
+                path_string = pathNode.parent_direction + " " + path_string; 
                 if (pathNode.parent_node != null)
                     pathNode = pathNode.parent_node;
             };
-        //algologger.buferrize(path_string);
-        //algologger.dump().then(() => logsReady.value = true);
+        logger.buferrize(path_string);
+        logger.dump()//.then(() => logsReady.value = true);
         return path.toReversed();    
     }
     //Симуляция пути на экране
     async function simulatePath(path: Array<Statement>) {
-        status = Status.simulate;
+        status.value = Status.simulate;
         let count = 1;
         view.value = path[0];
         let id = setTimeout(function oneStep() {
-            if (status == Status.simulate) {
+            if (status.value == Status.simulate) {
                 view.value = path[count];
                 count++;
                 if (count == path.length) {
-                    status = Status.ok;
+                    status.value = Status.ok;
                     clearTimeout(id);
                 } else id = setTimeout(oneStep, 100);
             } else clearTimeout(id);
         }, 100);
     }
 
-    const loadingLogs = computed(() => status != Status.wait && !logsReady);
+    const loadingLogs = computed(() => status.value != Status.wait && !logsReady.value);
+    const firstInStack = () => {
+        if (!nodeStack.isEmpty) return nodeStack.show().state.configuration
+        else return null
+    };
+    const firstStackPriorety = () => {
+        if (!nodeStack.isEmpty) return nodeStack.show().evristic
+        else return 0;
+    }
+    const stackSize = computed(() => nodeStack.size);
+    
 
     return {
         findWays, nonOwnPlace, manhattanDistance, nextStep, view,
         refresh, stepCountForUser, memoryUserCount, autoDFS, 
         result_time, solution_depth, autoIterativ,
-        IterativCheck, IterativFindWays, IterativStep, loadingLogs
+        firstStackPriorety, limitForUser,
+        IterativCheck, IterativFindWays, IterativStep, loadingLogs, firstInStack,
+        stackSize, logsReady, status
     };
 })

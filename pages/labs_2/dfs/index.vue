@@ -15,6 +15,11 @@ const modeName = computed(() => non_place_mode.value ? "Не на своих м�
 </script>
 
 <template>
+    <div class="centered">
+        <h1>Автоматический модифицированный DFS</h1>
+            ({{ modeName }})
+        <v-btn @click="switchMode">Сменить функцию</v-btn>
+    </div>
     <v-row>
         <v-col class="centered">
             <v-card class="protocol">
@@ -25,16 +30,28 @@ const modeName = computed(() => non_place_mode.value ? "Не на своих м�
             </v-card>
         </v-col>
         <v-col class="centered">
-            <h1>Автоматический модифицированный DFS</h1>
-            ({{ modeName }})
-            <v-btn @click="switchMode">Сменить функцию</v-btn>
             <nuxt-link to="/labs_2/dfs/step-by-step">Перейти на пошаговый алгоритм</nuxt-link>
             <label>Текущая глубина решения: {{ lab_2.solution_depth }}</label>
             <ai-game-board
                 :configuration="lab_2.view.configuration"
             />
-            <v-btn @click="auto">Запустить автоматический</v-btn>
-            <v-btn @click="refresh">Сбросить алгоритм</v-btn>
+            <v-btn @click="auto"
+            v-if="lab_2.status == 'Ожидает'">Запустить автоматический</v-btn>
+            <v-btn @click="refresh" v-else>Сбросить алгоритм</v-btn>
+            <div v-if="lab_2.loadingLogs">
+                <v-progress-circular
+                    indeterminate
+                    color="red"/>
+                <label>Идёт запись логов, необходимо подождать</label>
+            </div>
+            <a 
+                href="/lab_2.logs.txt" 
+                download
+                v-if="lab_2.logsReady"
+                class="link-as-btn"
+            >
+                Получить логи отработанного алгоритма
+            </a>
         </v-col>
     </v-row>
 </template>

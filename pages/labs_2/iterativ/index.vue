@@ -14,6 +14,12 @@ const modeName = computed(() => non_place_mode.value ? "Не на своих м�
 </script>
 
 <template>
+    <div class="centered">
+        <h1>Автоматический модифицированный IterativeDFS</h1>
+            ({{ modeName }})
+        <v-btn @click="switchMode">Сменить функцию</v-btn>
+        <nuxt-link to="/labs_2/iterativ/step-by-step">Перейти на пошаговый алгоритм</nuxt-link>
+    </div>
     <v-row>
         <v-col class="centered">
             <v-card class="protocol">
@@ -24,10 +30,6 @@ const modeName = computed(() => non_place_mode.value ? "Не на своих м�
             </v-card>
         </v-col>
         <v-col class="centered">
-            <h1>Автоматический модифицированный IterativeDFS</h1>
-            ({{ modeName }})
-            <v-btn @click="switchMode">Сменить функцию</v-btn>
-            <nuxt-link to="/labs_2/iterativ/step-by-step">Перейти на пошаговый алгоритм</nuxt-link>
             <label>Текущая глубина решения: {{ lab_2.solution_depth }}</label>
             <ai-game-board
                 :configuration="lab_2.view.configuration"
@@ -36,16 +38,6 @@ const modeName = computed(() => non_place_mode.value ? "Не на своих м�
             <v-btn @click="refresh">Сбросить алгоритм</v-btn>
         </v-col>
     </v-row>
-    <!--
-    <v-btn @click="switchMode">Текущая функция: {{ modeName }}</v-btn>
-    <v-btn @click="step">Сделать проверку</v-btn>
-    <label>Текущая глубина решения: {{ lab_2.solution_depth }}</label>
-    <ai-game-board
-        :configuration="lab_2.view.configuration"/>
-        <label>Выполненых итераций: {{ lab_2.stepCountForUser }}</label>
-        <label>Затрачено памяти: {{ lab_2.memoryUserCount }}</label>
-        <label>Затрачено времени: {{ lab_2.result_time }}</label>
-    -->
 </template>
 
 <style>

@@ -2,6 +2,9 @@
 import { useStateStore} from '@/store/stateStore'
 
 const stateStore = useStateStore();
+const step_childrens = ref([]);
+
+const status = ref(0);
 
 function oneStepDFS() {
     if (status.value == 0 || status.value == 2)
@@ -14,10 +17,6 @@ function oneStepDFS() {
         stateStore.nextStep(true);
     }
 }
-
-const step_childrens = ref([]);
-
-const status = ref(0);
 
 const statusInterpreter = computed(() => {
     switch(status.value) {

@@ -1,15 +1,14 @@
-import fs from 'fs'
-
 export class Logger {
     private static buffer : string;
-    private filePath: string;
-
-    constructor(filePath: string) {
-        this.filePath = filePath;
+    private filePath : string = '';
+    
+    openStream() {
+        let self = this
+        return useFetch('/api/logs');
     }
 
-    openStream() {
-        $fetch('/api/logs');
+    setFilePath(path: string) {
+        this.filePath = path;
     }
 
     buferrize(content: string) : void {

@@ -16,13 +16,13 @@ enum Status {
     noSolution = 'Нет решений',
 }
 
-const algologger = new Logger('logs.txt');
+const algologger = new Logger();
 
 export const useStateStore = defineStore('state', () => {
     const start_configuration = [0, 4, 3, 6, 2, 1, 7, 5, 8]; //Стартовая конфигурация
     const logsReady = ref(false); //Флаг готовности логов. Интерфейс
     
-    algologger.openStream(); //Запросить открытие файла логов
+    algologger.openStream().then(res => algologger.setFilePath(res.data.value!.filename)); //Запросить открытие файла логов
     const start_node = { //Корень дерева решений
         state: new Statement(start_configuration),
         depth: 0,
@@ -54,7 +54,7 @@ export const useStateStore = defineStore('state', () => {
         hashMap.set(view.value.hash(), 1);
         stepCountForUser.value = 0;
         algologger.reset();
-        algologger.openStream();
+        algologger.openStream().then(res => algologger.setFilePath(res.data.value!.filename));
         nodeQueue.reset();
         real_max_depth.value = 0;
         memoryCount = 0;
