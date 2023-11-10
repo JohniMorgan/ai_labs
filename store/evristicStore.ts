@@ -30,11 +30,6 @@ export const useEvristicStore = defineStore('evristic', () => {
        [1, 2, 3,
         4, 0, 5,
         6, 7, 8];
-        logger.openStream().then(res => {
-            logger.setFilePath(res.data.value!.filename);
-        });
-    
-
     const logsReady = ref(false);
     
     let limit = 1; //Текущий лимит алгоритма
@@ -71,7 +66,6 @@ export const useEvristicStore = defineStore('evristic', () => {
     function refresh() { //Сбросить состояние в начальное
         logsReady.value = false;
         logger.reset();
-        logger.openStream().then(res => logger.setFilePath(res.data.value!.filename));
         status.value = Status.wait;
         limit = 1;
         limitForUser.value = 1;
@@ -239,7 +233,11 @@ export const useEvristicStore = defineStore('evristic', () => {
         if (nodeStack.isEmpty) {
             status.value = Status.noSolution;
             logger.buferrize('Решение не найдено!\n');
-            logger.dump().then(() => logsReady.value = true);
+            logger.openStream().then(res => {
+                logger.setFilePath(res.data.value!.filename);
+                log_link.value = res.data.value!.filename;
+                logger.dump().then(() => logsReady.value = true);
+            });
         }
         if (status.value == Status.ok) simulatePath(pathRestoration(currentNode));
 
@@ -279,7 +277,11 @@ export const useEvristicStore = defineStore('evristic', () => {
             if (real_max_depth != limit) { 
                 logger.buferrize("Решение не найдено!\n");
                 status.value = Status.noSolution;
-                logger.dump().then(() => logsReady.value = true);
+                logger.openStream().then(res => {
+                    logger.setFilePath(res.data.value!.filename);
+                    log_link.value = res.data.value!.filename;
+                    logger.dump().then(() => logsReady.value = true);
+                });
                 return true;
             } else {
                 limit += 2;
@@ -330,7 +332,11 @@ export const useEvristicStore = defineStore('evristic', () => {
                     pathNode = pathNode.parent_node;
             };
         logger.buferrize(path_string);
-        logger.dump()//.then(() => logsReady.value = true);
+        logger.openStream().then(res => {
+            logger.setFilePath(res.data.value!.filename);
+            log_link.value = res.data.value!.filename;
+            logger.dump().then(() => logsReady.value = true);
+        });
         return path.toReversed();    
     }
     //Симуляция пути на экране
@@ -366,7 +372,7 @@ export const useEvristicStore = defineStore('evristic', () => {
         findWays, nonOwnPlace, manhattanDistance, nextStep, view,
         refresh, stepCountForUser, memoryUserCount, autoDFS, 
         result_time, solution_depth, autoIterativ,
-        firstStackPriorety, limitForUser,
+        firstStackPriorety, limitForUser, log_link,
         IterativCheck, IterativFindWays, IterativStep, loadingLogs, firstInStack,
         stackSize, logsReady, status
     };

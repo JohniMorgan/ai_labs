@@ -22,7 +22,6 @@ export const useStateStore = defineStore('state', () => {
     const start_configuration = [0, 4, 3, 6, 2, 1, 7, 5, 8]; //Стартовая конфигурация
     const logsReady = ref(false); //Флаг готовности логов. Интерфейс
     
-    algologger.openStream().then(res => algologger.setFilePath(res.data.value!.filename)); //Запросить открытие файла логов
     const start_node = { //Корень дерева решений
         state: new Statement(start_configuration),
         depth: 0,
@@ -40,6 +39,7 @@ export const useStateStore = defineStore('state', () => {
     hashMap.set(start_node.state.hash(), 1); //Постановка стартового состояния как посещённого
     const status = ref(Status.wait); //Текущий статус программы в целом
     const real_max_depth = ref(0); //Максимальная глубина отображаемая в интерфейсе
+    const log_link = ref('');
     let memoryCount = 0;
     const memoryUserCount = ref(0);
 
@@ -54,7 +54,6 @@ export const useStateStore = defineStore('state', () => {
         hashMap.set(view.value.hash(), 1);
         stepCountForUser.value = 0;
         algologger.reset();
-        algologger.openStream().then(res => algologger.setFilePath(res.data.value!.filename));
         nodeQueue.reset();
         real_max_depth.value = 0;
         memoryCount = 0;
@@ -234,7 +233,11 @@ export const useStateStore = defineStore('state', () => {
         }
         else { algologger.buferrize("Решения не существует ")
             status.value = Status.noSolution;
-            algologger.dump().then(() => logsReady.value = true);
+            algologger.openStream().then(res => {
+                algologger.setFilePath(res.data.value!.filename);
+                log_link.value = res.data.value!.filename;
+                algologger.dump().then(() => logsReady.value = true);
+            });
         }
         stepCountForUser.value = realStepCount;
         memoryUserCount.value = memoryCount;
@@ -304,7 +307,11 @@ export const useStateStore = defineStore('state', () => {
                     final = final.parent_node;
             };
         algologger.buferrize(path_string);
-        algologger.dump().then(() => logsReady.value = true);
+        algologger.openStream().then(res => {
+            algologger.setFilePath(res.data.value!.filename);
+            log_link.value = res.data.value!.filename;
+            algologger.dump().then(() => logsReady.value = true);
+        });
         return path.toReversed();    
     }
     //Симуляция пути на экране
@@ -341,6 +348,6 @@ export const useStateStore = defineStore('state', () => {
     //Блок основных функций, а также функций первой лабораторной работы
     checkFinal, findPosition, loadingLogs, view, depthForUser, findWays, nextStep, autoDFS,
     autoIterativ, IterativDFSStep, stepCountForUser, pathRestoration, currentNode, logsReady, refresh,
-    limit, IterativDFSFind, IterativDFSCheck, status, stackSize, firstInStack, memoryUserCount
+    limit, IterativDFSFind, IterativDFSCheck, status, stackSize, firstInStack, memoryUserCount, log_link
     };
 })

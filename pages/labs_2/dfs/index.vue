@@ -45,7 +45,7 @@ const modeName = computed(() => non_place_mode.value ? "Не на своих м�
                 <label>Идёт запись логов, необходимо подождать</label>
             </div>
             <a 
-                href="/lab_2.logs.txt" 
+                :href="`/${lab_2.log_link}`" 
                 download
                 v-if="lab_2.logsReady"
                 class="link-as-btn"

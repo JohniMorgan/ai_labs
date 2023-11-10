@@ -17,7 +17,7 @@
                 <label>Идёт запись логов, необходимо подождать</label>
             </div>
             <a 
-                href="/logs.txt" 
+                :href="`/${stateStore.log_link}`" 
                 download
                 v-if="stateStore.logsReady"
                 class="link-as-btn"

@@ -34,8 +34,23 @@ const modeName = computed(() => non_place_mode.value ? "Не на своих м�
             <ai-game-board
                 :configuration="lab_2.view.configuration"
             />
-            <v-btn @click="auto">Запустить автоматический</v-btn>
-            <v-btn @click="refresh">Сбросить алгоритм</v-btn>
+            <v-btn @click="auto"
+            v-if="lab_2.status == 'Ожидает'">Запустить автоматический</v-btn>
+            <v-btn @click="refresh" v-else>Сбросить алгоритм</v-btn>
+            <div v-if="lab_2.loadingLogs">
+                <v-progress-circular
+                    indeterminate
+                    color="red"/>
+                <label>Идёт запись логов, необходимо подождать</label>
+            </div>
+            <a 
+                :href="`/${lab_2.log_link}`" 
+                download
+                v-if="lab_2.logsReady"
+                class="link-as-btn"
+            >
+                Получить логи отработанного алгоритма
+            </a>
         </v-col>
     </v-row>
 </template>

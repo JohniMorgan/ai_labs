@@ -16,7 +16,6 @@ function oneStepDFS() {
     {
         protocolStep.value = 1;
         step_childrens.value = lab_2.findWays(mode.value ? lab_2.nonOwnPlace : lab_2.manhattanDistance);
-        console.log(step_childrens.value);
     }
     else {
         protocolStep.value = 2;

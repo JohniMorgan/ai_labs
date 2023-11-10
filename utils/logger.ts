@@ -3,7 +3,6 @@ export class Logger {
     private filePath : string = '';
     
     openStream() {
-        let self = this
         return useFetch('/api/logs');
     }
 
@@ -20,6 +19,7 @@ export class Logger {
     }
 
     async dump() {
+
         await $fetch('/api/logs/dump?key=esbutov', {
             method: 'post',
             headers: {
